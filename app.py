@@ -116,9 +116,8 @@ def generate_feature_descriptions(document_text: str, feature_list: list, api_ke
         - The pre-condition 
         - The post condition
         - Validations/rules mentioned.
-        - The description must be highly verbose and exahustive. Include every single bullet point, sub-point, field list and rule from the relevant section.
+        - list every single UI field, status, and data point mentioned in the document. Mention all the descriptions and points covered under the feature in the document.
         - Do not summarize or condense any part of the document. Capture 100% of the details without omission.
-        - All sections, elements and fields should be included from the feature.
     4. IMPORTANT: Use ONLY the information provided in the `DOCUMENT_TEXT`. Do not add any information or make assumptions.
     5. Format your final output as a single JSON object, where the keys are the exact feature names from the `FEATURE_LIST` and the values are the detailed string descriptions.
     6. Before generating the feature description, please add the following paragraph at the start of each description:
@@ -423,3 +422,4 @@ st.markdown(
     unsafe_allow_html=True
 
 )
+
