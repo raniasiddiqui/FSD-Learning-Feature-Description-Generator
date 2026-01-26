@@ -2,3 +2,4 @@ streamlit
 PyMuPDF
 google-generativeai
 groq
+python-docx
