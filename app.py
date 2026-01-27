@@ -235,7 +235,7 @@ if 'combined_text' not in st.session_state: st.session_state.combined_text = Non
 
 # --- SIDEBAR ---
 with st.sidebar:
-    st.header("⚙️ Configuration")
+    # st.header("⚙️ Configuration")
     
     # NEW: Mode Selection
     analysis_mode = st.radio(
@@ -319,5 +319,6 @@ if st.session_state.descriptions:
             st.markdown(content)
             st.divider()
 
-st.markdown("<p style='text-align: center; color: #666;'>Built with Streamlit & Groq AI</p>", unsafe_allow_html=True)
+# st.markdown("<p style='text-align: center; color: #666;'>Built with Streamlit & Groq AI</p>", unsafe_allow_html=True)
+
 
