@@ -7,6 +7,7 @@ import os
 import re
 from groq import Groq
 from docx import Document  # pip install python-docx
+import pandas as pd
 
 # Page configuration
 st.set_page_config(
@@ -28,31 +29,83 @@ api_key = st.secrets.get("groq_api_key", None)
 model_name = st.secrets.get("groq_default_model", "llama-3.3-70b-versatile")
 
 def extract_text_from_file(uploaded_file) -> str:
-    """Extracts text from PDF, TXT, or DOCX."""
+    """Extracts text from PDF, TXT, DOCX, Excel, or Markdown."""
     file_extension = Path(uploaded_file.name).suffix.lower()
-    
+
     try:
+        # ---------- PDF ----------
         if file_extension == ".pdf":
-            with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as tmp_file:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
                 tmp_file.write(uploaded_file.getvalue())
                 tmp_path = tmp_file.name
+
             doc = fitz.open(tmp_path)
             text = "".join([page.get_text() for page in doc])
             doc.close()
             os.unlink(tmp_path)
             return text
-        
+
+        # ---------- DOCX ----------
         elif file_extension == ".docx":
             doc = Document(uploaded_file)
             return "\n".join([para.text for para in doc.paragraphs])
-        
+
+        # ---------- TXT ----------
         elif file_extension == ".txt":
             return str(uploaded_file.read(), "utf-8")
-            
+
+        # ---------- MARKDOWN (.md) ----------
+        elif file_extension == ".md":
+            return str(uploaded_file.read(), "utf-8")
+
+        # ---------- EXCEL (.xlsx / .xls) ----------
+        elif file_extension in [".xlsx", ".xls"]:
+            excel_data = pd.read_excel(uploaded_file, sheet_name=None)
+
+            extracted_text = []
+            for sheet_name, df in excel_data.items():
+                extracted_text.append(f"\n--- Sheet: {sheet_name} ---\n")
+
+                # Convert sheet rows into text
+                extracted_text.append(
+                    df.fillna("").astype(str).to_string(index=False)
+                )
+
+            return "\n".join(extracted_text)
+
         return ""
+
     except Exception as e:
         st.error(f"Error processing {uploaded_file.name}: {e}")
         return ""
+
+
+# def extract_text_from_file(uploaded_file) -> str:
+#     """Extracts text from PDF, TXT, or DOCX."""
+#     file_extension = Path(uploaded_file.name).suffix.lower()
+    
+#     try:
+#         if file_extension == ".pdf":
+#             with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as tmp_file:
+#                 tmp_file.write(uploaded_file.getvalue())
+#                 tmp_path = tmp_file.name
+#             doc = fitz.open(tmp_path)
+#             text = "".join([page.get_text() for page in doc])
+#             doc.close()
+#             os.unlink(tmp_path)
+#             return text
+        
+#         elif file_extension == ".docx":
+#             doc = Document(uploaded_file)
+#             return "\n".join([para.text for para in doc.paragraphs])
+        
+#         elif file_extension == ".txt":
+#             return str(uploaded_file.read(), "utf-8")
+            
+#         return ""
+#     except Exception as e:
+#         st.error(f"Error processing {uploaded_file.name}: {e}")
+#         return ""
 
 def generate_descriptions(document_text: str, feature_list: list, api_key: str, model_name: str, mode: str) -> dict:
     """Uses Groq to extract requirements based on mode."""
@@ -269,7 +322,7 @@ with col1:
     st.header("📤 Upload Documents")
     uploaded_files = st.file_uploader(
         "Upload FSD Files", 
-        type=['pdf', 'txt', 'docx'], 
+        type=['pdf', 'txt', 'docx', 'xlsx', 'xls', 'md'],
         accept_multiple_files=True
     )
     
@@ -320,5 +373,6 @@ if st.session_state.descriptions:
             st.divider()
 
 # st.markdown("<p style='text-align: center; color: #666;'>Built with Streamlit & Groq AI</p>", unsafe_allow_html=True)
+
 
 
