@@ -179,23 +179,47 @@ def generate_descriptions(document_text: str, feature_list: list, api_key: str, 
 
         # Method 1: Try to extract JSON block if wrapped in ```
         import re
+        # Extract JSON block first
         json_match = re.search(r'\{.*\}', content, re.DOTALL)
         if json_match:
             json_str = json_match.group(0)
         else:
             json_str = content
 
-        try:
-            feature_descriptions = json.loads(json_str)
-        except json.JSONDecodeError as e:
-            st.error(f"JSON parsing failed: {e}")
-            st.code(json_str[:1000] + "..." if len(json_str) > 1000 else json_str)
+        # Safe parsing
+        feature_descriptions = safe_json_loads(json_str)
+
+        if not feature_descriptions:
             return {}
 
         return feature_descriptions
 
-    except Exception as e:
-        st.error(f"Error communicating with Groq model: {e}")
+def safe_json_loads(raw_text: str):
+    """
+    Attempts to repair common LLM JSON issues:
+    - unescaped newlines
+    - control characters
+    - stray markdown
+    """
+    try:
+        return json.loads(raw_text)
+    except json.JSONDecodeError:
+        pass
+
+    # -------- FIX 1: remove control chars --------
+    cleaned = re.sub(r'[\x00-\x1F\x7F]', '', raw_text)
+
+    # -------- FIX 2: remove markdown wrappers --------
+    cleaned = cleaned.replace("```json", "").replace("```", "")
+
+    # -------- FIX 3: normalize newlines --------
+    cleaned = cleaned.replace('\r', '\\r').replace('\n', '\\n')
+
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError as e:
+        st.error(f"JSON parsing failed even after repair: {e}")
+        st.code(cleaned[:1500] + "..." if len(cleaned) > 1500 else cleaned)
         return {}
 
 
@@ -373,6 +397,7 @@ if st.session_state.descriptions:
             st.divider()
 
 # st.markdown("<p style='text-align: center; color: #666;'>Built with Streamlit & Groq AI</p>", unsafe_allow_html=True)
+
 
 
 
