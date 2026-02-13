@@ -3,3 +3,4 @@ PyMuPDF
 google-generativeai
 groq
 python-docx
+openpyxl
