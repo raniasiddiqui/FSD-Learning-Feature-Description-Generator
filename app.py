@@ -193,6 +193,9 @@ def generate_descriptions(document_text: str, feature_list: list, api_key: str, 
             return {}
 
         return feature_descriptions
+    except Exception as e: 
+        st.error(f"Error communicating with Groq model: {e}") 
+        return {}
 
 def safe_json_loads(raw_text: str):
     """
@@ -397,6 +400,7 @@ if st.session_state.descriptions:
             st.divider()
 
 # st.markdown("<p style='text-align: center; color: #666;'>Built with Streamlit & Groq AI</p>", unsafe_allow_html=True)
+
 
 
 
