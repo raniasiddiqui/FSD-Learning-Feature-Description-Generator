@@ -8,6 +8,9 @@ import re
 from groq import Groq
 from docx import Document  # pip install python-docx
 import pandas as pd
+import easyocr
+import numpy as np
+from PIL import Image
 
 # Page configuration
 st.set_page_config(
@@ -434,6 +437,7 @@ if st.session_state.descriptions:
             st.divider()
 
 # st.markdown("<p style='text-align: center; color: #666;'>Built with Streamlit & Groq AI</p>", unsafe_allow_html=True)
+
 
 
 
