@@ -4,3 +4,7 @@ google-generativeai
 groq
 python-docx
 openpyxl
+easyocr
+numpy
+Pillow
+
