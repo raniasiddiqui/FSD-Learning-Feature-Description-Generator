@@ -409,7 +409,7 @@ with col2:
     if analysis_mode == "Structured" and not features_list:
         ready = False
 
-    if st.button("✨ Generate Requirements", disabled=not ready):
+    if st.button("✨ Generate Analysis", disabled=not ready):
         results = generate_descriptions(
             st.session_state.combined_text,
             features_list,
@@ -437,6 +437,7 @@ if st.session_state.descriptions:
             st.divider()
 
 # st.markdown("<p style='text-align: center; color: #666;'>Built with Streamlit & Groq AI</p>", unsafe_allow_html=True)
+
 
 
 
